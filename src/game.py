@@ -1,6 +1,6 @@
 import pygame
 
-from src.systems import MovementSystem, RenderSystem, StateSystem
+from src.systems import MovementSystem, RenderSystem, InputSystem
 
 
 class Game:
@@ -11,8 +11,8 @@ class Game:
         self.is_paused = False
         self.game_speed = 1.0
         self.systems = [
+            InputSystem(),
             MovementSystem(),
-            StateSystem(),
             RenderSystem(screen),
         ]
         self.entities = []

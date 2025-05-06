@@ -1,13 +1,19 @@
 from src.ecs import Component
 from pygame import Vector2, image, Surface, Rect
+import pygame
 from typing import Optional, Dict
 
 
 class State(Component):
-    '''Component that stores data about state of an object.'''
+    '''Component that stores data about states of an object.'''
     def __init__(self, initial_state: str):
         self.current: str = initial_state
         self.states: Dict[str, 'BaseState'] = {}
+
+
+class InputTag(Component):
+    '''Tag that the entity can handle input.'''
+    pass
 
 
 class Transform(Component):

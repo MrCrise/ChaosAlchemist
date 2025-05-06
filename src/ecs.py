@@ -26,5 +26,5 @@ class System:
         required = self.required_components
         return all(t in entity.components for t in required)
 
-    def update(self, dtime):
+    def update(self, dt):
         pass

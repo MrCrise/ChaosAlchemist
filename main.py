@@ -22,12 +22,13 @@ if __name__ == '__main__':
     running = True
     while running:
         dt = clock.tick(FPS) / 1000.0
-        print(clock.get_fps())
+        # print(clock.get_fps())
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            game.systems[1].handle_event(event)
+
+            # game.systems[1].handle_event(event)
 
         game.update(dt)
         pygame.display.flip()
