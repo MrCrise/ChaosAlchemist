@@ -5,27 +5,52 @@ from typing import Optional, Dict
 
 
 class State(Component):
-    '''Component that stores data about states of an object.'''
+    '''
+    Component that stores data about states of an object.
+    '''
+
     def __init__(self, initial_state: str):
         self.current: str = initial_state
         self.states: Dict[str, 'BaseState'] = {}
 
 
 class InputTag(Component):
-    '''Tag that the entity can handle input.'''
+    '''
+    Tag that the entity can handle input.
+    '''
     pass
 
 
+class Collider(Component):
+    '''
+    Tag that the entity needs to be collided.
+    Also stores info about collision type.
+    '''
+
+    def __init__(self, collision_types: list = ['solid']):
+        # True if entity shouldn't block movement.
+        self.collision_types = collision_types
+
+
 class Transform(Component):
-    '''Component that stores position, rotation and scale of an object.'''
-    def __init__(self, rect: Optional[Rect] = None):
+    '''
+    Component that stores position, rotation and scale of an object.
+    '''
+
+    def __init__(self,
+                 rect: Optional[Rect] = None,
+                 inflate_by: Optional[tuple] = None):
         self.rect: Rect = rect if rect else Rect(0, 0, 32, 32)
+        self.hitbox: Rect = rect.copy() if inflate_by is None else rect.inflate(*inflate_by)
         self.rotation: float = 0.0
         self.scale: Vector2 = Vector2(1, 1)
 
 
 class Velocity(Component):
-    '''Component that stores object movement.'''
+    '''
+    Component that stores object movement.
+    '''
+
     def __init__(self, speed: float = 0.0):
         self.speed: float = speed
         self.direction: Vector2 = Vector2(0, 0)
@@ -33,7 +58,10 @@ class Velocity(Component):
 
 
 class Sprite(Component):
-    '''Component that stores visual representation of an object.'''
+    '''
+    Component that stores visual representation of an object.
+    '''
+
     def __init__(self,
                  image_path: Optional[str] = None,
                  color: tuple = (255, 255, 255),
@@ -43,6 +71,7 @@ class Sprite(Component):
         self.color: tuple = color
         self.size: tuple = size
         self.surface: Surface = self._load_surface()
+        self.mask = pygame.mask.from_surface(self.surface)
         self.visible: bool = True
 
     def _load_surface(self) -> Surface:
@@ -54,7 +83,10 @@ class Sprite(Component):
 
 
 class Health(Component):
-    '''Component that stores health of an object.'''
+    '''
+    Component that stores health of an object.
+    '''
+
     def __init__(self, max_hp: int = 100):
         self.max_hp: int = max_hp
         self.current_hp: int = max_hp

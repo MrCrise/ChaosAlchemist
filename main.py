@@ -1,10 +1,10 @@
 import pygame
 from src.game import Game
-from src.entitys import Player
+from src.entitys import Player, Obstacle
 from src.components import Transform, State
+from random import randint
 
-
-FPS = 165
+FPS = 240
 WINDOW_WIDTH, WINDOW_HEIGHT = 1920, 1080
 
 if __name__ == '__main__':
@@ -16,8 +16,14 @@ if __name__ == '__main__':
     game = Game(screen)
 
     player = Player('assets/images/player/down/0.png',
-                    (WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2))
+                    starting_pos=(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2))
     game.add_entity(player)
+
+    for i in range(10):
+        x, y = randint(0, WINDOW_WIDTH), randint(0, WINDOW_HEIGHT)
+        w, h = randint(50, 100), randint(50, 100)
+        obst = Obstacle(None, (w, h), (x, y))
+        game.add_entity(obst)
 
     running = True
     while running:
