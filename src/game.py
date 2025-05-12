@@ -1,6 +1,6 @@
 import pygame
 
-from src.systems import MovementSystem, RenderSystem, InputSystem, CollisionDetectionSystem, CollisionResolutionSystem
+from src.systems import MovementSystem, RenderSystem, InputSystem, CollisionDetectionSystem, CollisionResolutionSystem, StateSystem
 
 
 class Game:
@@ -18,8 +18,10 @@ class Game:
         col_detection_system = CollisionDetectionSystem()
         col_resolution_system = CollisionResolutionSystem(col_detection_system)
         render_system = RenderSystem(screen)
+        state_system = StateSystem()
         self.systems = [input_system,
                         movement_system,
+                        state_system,
                         col_detection_system,
                         col_resolution_system,
                         render_system]

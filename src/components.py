@@ -9,9 +9,8 @@ class State(Component):
     Component that stores data about states of an object.
     '''
 
-    def __init__(self, initial_state: str):
-        self.current: str = initial_state
-        self.states: Dict[str, 'BaseState'] = {}
+    def __init__(self, initial_states: Optional[dict] = None):
+        self.states: dict = initial_states if initial_states is not None else {}
 
 
 class InputTag(Component):

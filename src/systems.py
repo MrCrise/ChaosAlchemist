@@ -1,6 +1,7 @@
 from src.components import Transform, Velocity, State, Sprite, InputTag, Collider
 from src.ecs import System, Component, Entity
 from src.events import CollisionEvent
+from src.states import IdleState, MovingState
 import pygame
 
 
@@ -13,42 +14,38 @@ class StateSystem(System):
         for entity in self.entities:
             state_comp: Component = entity.get_component(State)
 
-            current_state_key: str = state_comp.current
+            current_states_status: list = state_comp.states
 
-            current_state = state_comp.states.get(current_state_key)
-            if not current_state:
-                print(f'Invalid current state: {current_state_key}')
-                continue
+            if 'idle' in current_states_status and 'moving' in current_states_status:
+                self._handle_movement_states(entity, current_states_status)
 
-            new_state = current_state.update(entity, dt)
+    def _handle_movement_states(self, entity, current_states_status) -> None:
+        velocity = entity.get_component(Velocity)
 
-            if (new_state is not None) and (new_state in state_comp.states):
-                self._change_state(entity, state_comp, new_state)
+        is_idling = current_states_status['idle']
+        moving_directions = set()
 
-    def handle_event(self, event) -> None:
-        for entity in self.entities:
-            state_comp: Component = entity.get_component(State)
+        if velocity.direction.length() > 0:
+            is_idling = False
 
-            current_state_key: str = state_comp.current
+            if velocity.direction.x > 0:
+                moving_directions.add('right')
+            elif velocity.direction.x < 0:
+                moving_directions.add('left')
 
-            current_state = state_comp.states.get(current_state_key)
-            if not current_state:
-                print(f'Invalid current state: {current_state_key}')
-                continue
+            if velocity.direction.y > 0:
+                moving_directions.add('down')
+            elif velocity.direction.y < 0:
+                moving_directions.add('up')
+        else:
+            is_idling = True
 
-            new_state = current_state.handle_event(entity, event)
+        current_states_status['idle'] = is_idling
+        current_states_status['moving'] = moving_directions if moving_directions != set(
+        ) else None
 
-            if new_state:
-                self._change_state(entity, state_comp, new_state)
-
-    def _change_state(self, entity, state_comp, new_state_key):
-        if new_state_key not in state_comp.states:
-            print(f"Attempt to switch to invalid state: {new_state_key}")
-            return
-
-        state_comp.states[state_comp.current].exit(entity)
-        state_comp.current = new_state_key
-        state_comp.states[new_state_key].enter(entity)
+    def _handle_attacking_states(self, entity):
+        pass
 
 
 class InputSystem(System):

@@ -16,13 +16,19 @@ class Player(Entity):
             Transform(
                 rect=self.get_component(
                     Sprite).surface.get_rect(center=starting_pos),
-                inflate_by=(-60, 0)
+                inflate_by=(0, 0)
             )
         )
         self.add_component(Velocity(500))
         self.add_component(Health(100))
         self.add_component(InputTag())
         self.add_component(Collider())
+
+        possible_states = {
+            'idle': True,
+            'moving': set(),
+        }
+        self.add_component(State(possible_states))
 
 
 class Obstacle(Entity):

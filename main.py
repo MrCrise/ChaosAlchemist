@@ -15,7 +15,7 @@ if __name__ == '__main__':
 
     game = Game(screen)
 
-    player = Player('assets/images/player/down/0.png',
+    player = Player('assets/images/player/right/0.png',
                     starting_pos=(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2))
     game.add_entity(player)
 
@@ -29,6 +29,8 @@ if __name__ == '__main__':
     while running:
         dt = clock.tick(FPS) / 1000.0
         # print(clock.get_fps())
+
+        print(player.get_component(State).states['moving'])
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
