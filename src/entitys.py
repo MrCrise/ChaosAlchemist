@@ -2,6 +2,7 @@ from typing import Optional
 from src.ecs import Entity
 from src.components import *
 from src.states import *
+from src.sprite_utils import *
 
 
 class Player(Entity):
@@ -19,16 +20,23 @@ class Player(Entity):
                 inflate_by=(0, 0)
             )
         )
-        self.add_component(Velocity(500))
+        self.add_component(Velocity(600))
         self.add_component(Health(100))
         self.add_component(InputTag())
         self.add_component(Collider())
 
         possible_states = {
             'idle': True,
-            'moving': set(),
+            'moving': None,
         }
         self.add_component(State(possible_states))
+
+        anims = {
+            'idle': AnimationData(SpriteLoader.load_folder_frames(r'assets\images\player\idle')),
+            'move_right': AnimationData(SpriteLoader.load_folder_frames(r'assets\images\player\right')),
+            'move_left': AnimationData(SpriteLoader.load_folder_frames(r'assets\images\player\left'))
+        }
+        self.add_component(Animation(anims))
 
 
 class Obstacle(Entity):

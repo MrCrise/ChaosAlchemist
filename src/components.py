@@ -39,6 +39,7 @@ class Transform(Component):
     def __init__(self,
                  rect: Optional[Rect] = None,
                  inflate_by: Optional[tuple] = None):
+
         self.rect: Rect = rect if rect else Rect(0, 0, 32, 32)
         self.hitbox: Rect = rect.copy() if inflate_by is None else rect.inflate(*inflate_by)
         self.rotation: float = 0.0
@@ -79,6 +80,23 @@ class Sprite(Component):
         surf = Surface(self.size)
         surf.fill(self.color)
         return surf
+
+
+class Animation(Component):
+    '''
+    Component that stores animation data of an object.
+    '''
+
+    def __init__(self,
+                 animations: dict = {},
+                 current_animation: str = 'idle',
+                 time_passed: float = 0,
+                 current_frame: int = 0):
+
+        self.animations: dict = animations
+        self.current_animation: str = current_animation
+        self.time_passed: float = time_passed
+        self.current_frame: int = current_frame
 
 
 class Health(Component):

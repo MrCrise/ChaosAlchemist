@@ -32,6 +32,8 @@ if __name__ == '__main__':
 
         print(player.get_component(State).states['moving'])
 
+        pygame.display.set_caption(f'Chaos Alchemist - FPS: {clock.get_fps()}')
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False

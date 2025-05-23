@@ -1,4 +1,4 @@
-from src.components import Transform, Velocity, State, Sprite, InputTag, Collider
+from src.components import Transform, Velocity, State, Sprite, InputTag, Collider, Animation
 from src.ecs import System, Component, Entity
 from src.events import CollisionEvent
 from src.states import IdleState, MovingState
@@ -6,6 +6,10 @@ import pygame
 
 
 class StateSystem(System):
+    '''
+    System that changes the states of entities.
+    '''
+
     def __init__(self):
         super().__init__()
         self.required_components = [State]
@@ -49,6 +53,10 @@ class StateSystem(System):
 
 
 class InputSystem(System):
+    '''
+    System that handles player input.
+    '''
+
     def __init__(self):
         super().__init__()
         self.required_components = [InputTag]
@@ -84,6 +92,10 @@ class InputSystem(System):
 
 
 class MovementSystem(System):
+    '''
+    System that handles movement of entities.
+    '''
+
     def __init__(self):
         super().__init__()
         self.required_components = [Transform, Velocity]
@@ -101,7 +113,76 @@ class MovementSystem(System):
             transform.rect.center = transform.hitbox.center
 
 
+class AnimationSystem(System):
+    '''
+    System that handles animations of entities.
+    '''
+
+    def __init__(self):
+        super().__init__()
+        self.required_components = [Sprite, Animation]
+
+    def update(self, dt: float) -> None:
+        for entity in self.entities:
+            sprite: Component = entity.get_component(Sprite)
+            animation: Component = entity.get_component(Animation)
+
+            if entity.get_component(State) is not None:
+                state: Component = entity.get_component(State)
+                self._select_animation(animation, state)
+
+            self._update_animation_frame(animation, sprite, dt)
+
+    def _select_animation(self, animation: Component, state: Component):
+        if 'moving' in state.states and state.states['moving'] is not None:
+            directions = state.states['moving']
+
+            if 'left' in directions and 'move_left' in animation.animations:
+                self._set_current_animation(animation, 'move_left')
+            elif 'right' in directions and 'move_right' in animation.animations:
+                self._set_current_animation(animation, 'move_right')
+
+        elif 'idle' in state.states and state.states['idle']:
+            self._set_current_animation(animation, 'idle')
+
+    def _set_current_animation(self, animation: Component, animation_name: str):
+        if animation.current_animation != animation_name:
+            animation.current_animation = animation_name
+            animation.time_passed = 0
+            animation.current_frame = 0
+
+    def _update_animation_frame(self, animation: Component, sprite: Component, dt: float):
+        if not animation.current_animation:
+            return
+
+        current_animation_data = animation.animations.get(
+            animation.current_animation)
+        if not current_animation_data or not current_animation_data.frames:
+            return
+
+        animation.time_passed += dt
+
+        if animation.time_passed >= current_animation_data.frame_duration:
+            animation.current_frame += 1
+            animation.time_passed = 0
+
+            if animation.current_frame >= len(current_animation_data.frames):
+                if current_animation_data.loop:
+                    animation.current_frame = 0
+                else:
+                    # Stay on last frame if animation isn't looped.
+                    animation.current_frame -= 1
+
+        current_frame: pygame.Surface = current_animation_data.frames[animation.current_frame]
+        sprite.surface = current_frame
+        sprite.mask = pygame.mask.from_surface(current_frame)
+
+
 class CollisionDetectionSystem(System):
+    '''
+    System that detects collisions between entities and stores it as events.
+    '''
+
     def __init__(self):
         super().__init__()
         self.required_components = [Collider, Transform]
@@ -135,6 +216,10 @@ class CollisionDetectionSystem(System):
 
 
 class CollisionResolutionSystem(System):
+    '''
+    System that resolves collision events.
+    '''
+
     def __init__(self, detection_system: CollisionDetectionSystem):
         super().__init__()
         self.required_components = [Collider, Transform]
@@ -168,6 +253,10 @@ class CollisionResolutionSystem(System):
 
 
 class RenderSystem(System):
+    '''
+    System that visualises entities on screen.
+    '''
+
     def __init__(self, screen):
         super().__init__()
         self.screen = screen
